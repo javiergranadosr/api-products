@@ -1,8 +1,7 @@
 package com.example.demo.controllers;
 
-import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
-import com.example.demo.services.impl.DepartmentServiceImpl;
+import com.example.demo.services.IDepartmentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class DepartmentController {
 
-    private final DepartmentServiceImpl service;
+    private final IDepartmentService service;
 
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody DepartmentDTO departmentDTO, BindingResult results) {
