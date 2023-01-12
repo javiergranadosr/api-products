@@ -7,6 +7,7 @@ import com.example.demo.utils.ResponseSuccess;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class DepartmentController {
 
     private final IDepartmentService service;
 
-    @GetMapping
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Page<Department>> findAll(
             @RequestParam(required = false, value = "page", defaultValue = "0") int page,
             @RequestParam(required = false, value = "size", defaultValue = "10") int size,
@@ -34,7 +35,12 @@ public class DepartmentController {
         return new ResponseEntity<>(this.service.findAll(page, size, orderBy), HttpStatus.OK);
     }
 
-    @PostMapping
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Department> findById(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(this.service.findById(id), HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> create(@Valid @RequestBody DepartmentDTO departmentDTO, BindingResult results) {
         // Verificamos si tenemos errores en la validacion de campos, caso contrario guardamos departamento
         if (results.hasErrors()) {

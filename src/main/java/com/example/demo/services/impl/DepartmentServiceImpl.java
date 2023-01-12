@@ -1,6 +1,7 @@
 package com.example.demo.services.impl;
 
 import com.example.demo.exceptions.ErrorDataAccessException;
+import com.example.demo.exceptions.ErrorNotFound;
 import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
 import com.example.demo.repositories.DeparmentRepository;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class DepartmentServiceImpl implements IDepartmentService {
@@ -26,34 +26,45 @@ public class DepartmentServiceImpl implements IDepartmentService {
 
     /**
      * Obtener listado de los departamentos
-     * @param page Numero de pagina
-     * @param size Cantidad de departamentos a listar
+     *
+     * @param page    Numero de pagina
+     * @param size    Cantidad de departamentos a listar
      * @param orderBy Ordenar por, (key_department, name)
      * @return
      */
     @Override
     public Page<Department> findAll(int page, int size, String orderBy) {
+        log.info("Init findAll()");
         return this.departmentRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy)));
     }
 
+    /**
+     * Buscar departamento por ID
+     *
+     * @param id
+     * @return
+     */
     @Override
-    public Optional<Department> findById(Long id) {
-        return Optional.empty();
+    public Department findById(Long id) {
+        log.info("Init findById()");
+        return this.departmentRepository.findById(id)
+                .orElseThrow(() -> new ErrorNotFound("Department not found."));
     }
 
     /**
      * Crea un nuevo departamento
+     *
      * @param departmentDTO
      * @return
      */
     @Override
     public Department create(DepartmentDTO departmentDTO) {
         log.info("Init create()");
-        try{
+        try {
             log.info("Success in create");
             Department department = this.modelMapper.map(departmentDTO, Department.class); // Convierte DTO en Department
             return this.departmentRepository.save(department);
-        }catch (DataAccessException e) {
+        } catch (DataAccessException e) {
             log.info("Failed in create");
             log.info(e.getMessage());
             throw new ErrorDataAccessException("Error creating department.");
@@ -66,5 +77,6 @@ public class DepartmentServiceImpl implements IDepartmentService {
     }
 
     @Override
-    public void delete(Long id) {}
+    public void delete(Long id) {
+    }
 }

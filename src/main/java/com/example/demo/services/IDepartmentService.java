@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface IDepartmentService {
     Page<Department> findAll(int page, int size, String orderBy);
-    Optional<Department> findById(Long id);
+    Department findById(Long id);
     Department create(DepartmentDTO departmentDTO);
     Department update(Department department, Long id);
     void delete(Long id);

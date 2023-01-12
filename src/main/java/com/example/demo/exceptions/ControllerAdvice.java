@@ -20,4 +20,16 @@ public class ControllerAdvice {
         apiError.setPath(request.getRequestURI());
         return new ResponseEntity<>(apiError,HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(value = ErrorNotFound.class)
+    public ResponseEntity<ApiError> notFoundExceptionHandler(ErrorNotFound exception, HttpServletRequest request) {
+        ApiError apiError = new ApiError();
+        apiError.setDate(LocalDateTime.now());
+        apiError.setCode(HttpStatus.NOT_FOUND.value());
+        apiError.setMessageCode(HttpStatus.NOT_FOUND.getReasonPhrase());
+        apiError.setMessage(exception.getMessage());
+        apiError.setPath(request.getRequestURI());
+        return new ResponseEntity<>(apiError,HttpStatus.NOT_FOUND);
+    }
+
 }
