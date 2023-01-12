@@ -4,6 +4,8 @@ import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
 import com.example.demo.services.IDepartmentService;
 import com.example.demo.utils.ResponseSuccess;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -22,11 +24,13 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1/departments")
 @AllArgsConstructor
+@Api(tags = "DepartmentController")
 public class DepartmentController {
 
     private final IDepartmentService service;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get all departments.")
     ResponseEntity<Page<Department>> findAll(
             @RequestParam(required = false, value = "page", defaultValue = "0") int page,
             @RequestParam(required = false, value = "size", defaultValue = "10") int size,
@@ -36,6 +40,7 @@ public class DepartmentController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get department by id.")
     public ResponseEntity<Department> findById(@PathVariable("id") Long id) {
         return new ResponseEntity<>(this.service.findById(id), HttpStatus.OK);
     }
@@ -45,6 +50,7 @@ public class DepartmentController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @ApiOperation(value = "Create a new department.")
     ResponseEntity<?> create(@Valid @RequestBody DepartmentDTO departmentDTO, BindingResult results) {
         // Verificamos si tenemos errores en la validacion de campos, caso contrario guardamos departamento
         if (results.hasErrors()) {
@@ -68,6 +74,7 @@ public class DepartmentController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @ApiOperation(value = "Update department.")
     public ResponseEntity<?> update(
             @Valid @RequestBody DepartmentDTO departmentDTO,
             BindingResult results,
@@ -94,6 +101,7 @@ public class DepartmentController {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @ApiOperation( value = "Delete department.")
     public ResponseEntity<ResponseSuccess> delete(@PathVariable("id") Long id) {
         this.service.delete(id);
         ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Department deleted successfully.");
