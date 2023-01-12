@@ -16,6 +16,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @AllArgsConstructor
 public class DepartmentServiceImpl implements IDepartmentService {
@@ -71,9 +73,23 @@ public class DepartmentServiceImpl implements IDepartmentService {
         }
     }
 
+    /**
+     * Actualizar Departamento
+     * @param departmentDTO
+     * @param id
+     * @return
+     */
     @Override
-    public Department update(Department department, Long id) {
-        return null;
+    public Department update(DepartmentDTO departmentDTO, Long id) {
+        Optional<Department> department = this.departmentRepository.findById(id);
+        if (department.isPresent()) {
+            Department departmentToPersist = department.get();
+            departmentToPersist.setName(departmentDTO.getName());
+            departmentToPersist.setKeyDepartment(departmentDTO.getKeyDepartment());
+            return this.departmentRepository.save(departmentToPersist);
+        }else {
+            throw  new ErrorNotFound("Department not found.");
+        }
     }
 
     @Override

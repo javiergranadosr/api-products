@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/departments")
+@RequestMapping("/api/v1/departments")
 @AllArgsConstructor
 public class DepartmentController {
 
@@ -40,7 +40,11 @@ public class DepartmentController {
         return new ResponseEntity<>(this.service.findById(id), HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(
+            method = RequestMethod.POST,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     ResponseEntity<?> create(@Valid @RequestBody DepartmentDTO departmentDTO, BindingResult results) {
         // Verificamos si tenemos errores en la validacion de campos, caso contrario guardamos departamento
         if (results.hasErrors()) {
@@ -56,5 +60,32 @@ public class DepartmentController {
         this.service.create(departmentDTO);
         ResponseSuccess response = new ResponseSuccess(HttpStatus.CREATED.value(), "Department created successfully.");
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<?> update(
+            @Valid @RequestBody DepartmentDTO departmentDTO,
+            BindingResult results,
+            @PathVariable("id") Long id
+    ) {
+        if (results.hasErrors()) {
+            Map<String, Object> errorMap = new HashMap<>();
+            List<String> errors = results.getFieldErrors()
+                    .stream()
+                    .map(err -> "Field " + err.getField() + ": " + err.getDefaultMessage())
+                    .collect(Collectors.toList());
+            errorMap.put("code", HttpStatus.BAD_REQUEST.value());
+            errorMap.put("errors", errors);
+            return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+        } else {
+            this.service.update(departmentDTO, id);
+            ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Department updated successfully.");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
     }
 }

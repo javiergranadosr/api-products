@@ -10,6 +10,6 @@ public interface IDepartmentService {
     Page<Department> findAll(int page, int size, String orderBy);
     Department findById(Long id);
     Department create(DepartmentDTO departmentDTO);
-    Department update(Department department, Long id);
+    Department update(DepartmentDTO departmentDTO, Long id);
     void delete(Long id);
 }
