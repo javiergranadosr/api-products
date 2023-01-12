@@ -1,18 +1,22 @@
 package com.example.demo.models.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-@Data
+@Getter
+@Setter
 public class DepartmentDTO {
-    @NotEmpty( message = "keyDeparment is required")
+    @NotNull
+    @NotEmpty
     @Size(min = 4, max = 20)
-    private String keyDeparment;
+    private String keyDepartment;
 
-    @NotEmpty(message = "Name is required")
+    @NotNull
+    @NotEmpty
     @Size(min = 10, max = 200)
     private String name;
 }
