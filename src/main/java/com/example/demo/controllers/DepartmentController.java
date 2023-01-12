@@ -88,4 +88,15 @@ public class DepartmentController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
+
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<ResponseSuccess> delete(@PathVariable("id") Long id) {
+        this.service.delete(id);
+        ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Department deleted successfully.");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
