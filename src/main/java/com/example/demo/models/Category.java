@@ -1,14 +1,17 @@
 package com.example.demo.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "categories")
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +19,6 @@ public class Category {
 
     @Column(length = 200, nullable = false)
     private String name;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"categories", "hibernateLazyInitializer", "handler"})

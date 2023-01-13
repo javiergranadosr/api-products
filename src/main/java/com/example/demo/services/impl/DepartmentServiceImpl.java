@@ -4,7 +4,7 @@ import com.example.demo.exceptions.ErrorDataAccessException;
 import com.example.demo.exceptions.ErrorNotFound;
 import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
-import com.example.demo.repositories.DeparmentRepository;
+import com.example.demo.repositories.DepartmentRepository;
 import com.example.demo.services.IDepartmentService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -24,7 +23,7 @@ import java.util.Optional;
 public class DepartmentServiceImpl implements IDepartmentService {
     private static final Logger log = LoggerFactory.getLogger(DepartmentServiceImpl.class);
 
-    private final DeparmentRepository departmentRepository;
+    private final DepartmentRepository departmentRepository;
     private final ModelMapper modelMapper = new ModelMapper();
 
     /**
@@ -64,12 +63,11 @@ public class DepartmentServiceImpl implements IDepartmentService {
     public Department create(DepartmentDTO departmentDTO) {
         log.info("Init create()");
         try {
-            log.info("Success in create");
             Department department = this.modelMapper.map(departmentDTO, Department.class); // Convierte DTO en Department
             return this.departmentRepository.save(department);
         } catch (DataAccessException e) {
-            log.info("Failed in create");
-            log.info(e.getMessage());
+            log.error("Failed in create");
+            log.error(e.getMessage());
             throw new ErrorDataAccessException("Error creating department.");
         }
     }
@@ -82,6 +80,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
      */
     @Override
     public Department update(DepartmentDTO departmentDTO, Long id) {
+        log.info("Init update()");
         Optional<Department> department = this.departmentRepository.findById(id);
         if (department.isPresent()) {
             Department departmentToPersist = department.get();
@@ -89,16 +88,19 @@ public class DepartmentServiceImpl implements IDepartmentService {
             departmentToPersist.setKeyDepartment(departmentDTO.getKeyDepartment());
             return this.departmentRepository.save(departmentToPersist);
         }else {
+            log.error("Department not found.");
             throw  new ErrorNotFound("Department not found.");
         }
     }
 
     @Override
     public void delete(Long id) {
+        log.info("Init delete()");
         Optional<Department> department = this.departmentRepository.findById(id);
         if(department.isPresent()) {
             this.departmentRepository.delete(department.get());
         }else {
+            log.error("Department not found.");
             throw  new ErrorNotFound("Department not found.");
         }
     }
