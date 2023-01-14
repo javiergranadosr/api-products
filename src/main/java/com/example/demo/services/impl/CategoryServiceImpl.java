@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -23,14 +25,28 @@ public class CategoryServiceImpl implements ICategoryService {
     private final CategoryRepository repository;
     private final DepartmentRepository departmentRepository;
 
+    /**
+     * Listado de categorias
+     * @param page # de pagina
+     * @param size Cantidad de categorias a mostrar por pagina
+     * @param orderBy Ordenar por
+     * @return
+     */
     @Override
     public Page<Category> findAll(int page, int size, String orderBy) {
-        return null;
+        log.info("Init findAll categories");
+        return this.repository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy)));
     }
 
+    /**
+     * Buscar categoria por ID
+     * @param id
+     * @return
+     */
     @Override
     public Category findById(Long id) {
-        return null;
+        log.info("Init findById category");
+        return this.repository.findById(id).orElseThrow(() -> new ErrorNotFound("Category not found."));
     }
 
     /**
