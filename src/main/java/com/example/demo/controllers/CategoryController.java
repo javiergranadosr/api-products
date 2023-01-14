@@ -52,7 +52,7 @@ public class CategoryController {
             @ApiResponse(code = 200, message = "Successfully retrieved", response = Category.class),
             @ApiResponse(code = 404, message = "Not Found", response = ApiError.class)
     })
-    public ResponseEntity<Category> findBy(@PathVariable("id") Long id) {
+    public ResponseEntity<Category> findById(@PathVariable("id") Long id) {
         return new ResponseEntity<>(this.service.findById(id), HttpStatus.OK);
     }
 
