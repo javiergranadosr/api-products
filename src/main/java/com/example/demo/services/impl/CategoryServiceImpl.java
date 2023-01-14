@@ -114,6 +114,14 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public void delete(Long id) {
-
+        log.info("Init delete category");
+        Optional<Category> category = this.repository.findById(id);
+        if (category.isPresent()) {
+            this.repository.delete(category.get());
+        }else {
+            log.error("Error deleted category.");
+            log.error("Category not found.");
+            throw new ErrorNotFound("Category not found.");
+        }
     }
 }

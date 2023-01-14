@@ -110,4 +110,19 @@ public class CategoryController {
         }
     }
 
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.DELETE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ApiOperation(value = "Delete category.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ResponseSuccess.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
+    })
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        this.service.delete(id);
+        ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Category deleted successfully.");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
