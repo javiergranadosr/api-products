@@ -78,4 +78,36 @@ public class CategoryController {
         }
     }
 
+    @RequestMapping(
+            value = "/{id}",
+            method = RequestMethod.PUT,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ApiOperation(value = "Update category.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ResponseSuccess.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
+    })
+    public ResponseEntity<?> update(
+            @Valid @RequestBody CategoryDTO categoryDTO,
+            BindingResult results,
+            @PathVariable("id") Long id
+    ) {
+        if (results.hasErrors()) {
+            Map<String, Object> errorMap = new HashMap<>();
+            List<String> errors = results.getFieldErrors()
+                    .stream()
+                    .map(err -> "Field " + err.getField() + ": " + err.getDefaultMessage())
+                    .collect(Collectors.toList());
+            errorMap.put("code", HttpStatus.BAD_REQUEST.value());
+            errorMap.put("errors", errors);
+            return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+        } else {
+            this.service.update(categoryDTO, id);
+            ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Category updated successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+    }
+
 }

@@ -27,8 +27,9 @@ public class CategoryServiceImpl implements ICategoryService {
 
     /**
      * Listado de categorias
-     * @param page # de pagina
-     * @param size Cantidad de categorias a mostrar por pagina
+     *
+     * @param page    # de pagina
+     * @param size    Cantidad de categorias a mostrar por pagina
      * @param orderBy Ordenar por
      * @return
      */
@@ -40,6 +41,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     /**
      * Buscar categoria por ID
+     *
      * @param id
      * @return
      */
@@ -74,9 +76,40 @@ public class CategoryServiceImpl implements ICategoryService {
         }
     }
 
+    /**
+     * Actualizar categoria
+     *
+     * @param categoryDTO
+     * @param id
+     * @return
+     */
     @Override
     public Category update(CategoryDTO categoryDTO, Long id) {
-        return null;
+        log.info("Init update category");
+        Optional<Category> category = this.repository.findById(id);
+        if (category.isPresent()) {
+            try {
+                Long departmentId = Long.parseLong(categoryDTO.getDepartmentId());
+                Optional<Department> department = this.departmentRepository.findById(departmentId);
+
+                if (department.isPresent()) {
+                    Category categoryToPersist = category.get();
+                    categoryToPersist.setName(categoryDTO.getName());
+                    categoryToPersist.setDepartment(department.get());
+                    return this.repository.save(categoryToPersist);
+                } else {
+                    log.error("Department not found.");
+                    throw new ErrorNotFound("Department not found.");
+                }
+            } catch (NumberFormatException e) {
+                log.error("Invalid department, must be number.");
+                throw new NumberFormatException("Invalid department, must be number.");
+            }
+        } else {
+            log.error("Error update category.");
+            log.error("Category not found.");
+            throw new ErrorNotFound("Category not found.");
+        }
     }
 
     @Override
