@@ -122,8 +122,19 @@ public class ProductServiceImpl implements IProductService {
         }
     }
 
+    /**
+     * Eliminar producto por Id
+     * @param id
+     */
     @Override
     public void delete(Long id) {
-
+        log.info("Init delete producto.");
+        Optional<Product> product = this.productRepository.findById(id);
+        if (product.isPresent()) {
+            this.productRepository.delete(product.get());
+        } else {
+            log.error("Product not found");
+            throw new ErrorNotFound("Product not found.");
+        }
     }
 }

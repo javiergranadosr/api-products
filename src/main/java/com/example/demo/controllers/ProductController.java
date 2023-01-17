@@ -106,4 +106,17 @@ public class ProductController {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
+
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Delete product.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ResponseSuccess.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
+    })
+    public ResponseEntity<ResponseSuccess> delete(@PathVariable("id") Long id) {
+        this.service.delete(id);
+        ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Product deleted successfully.");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
+
