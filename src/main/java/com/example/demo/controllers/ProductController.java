@@ -1,5 +1,7 @@
 package com.example.demo.controllers;
 
+import com.example.demo.exceptions.ApiError;
+import com.example.demo.models.Product;
 import com.example.demo.models.dto.ProductDTO;
 import com.example.demo.services.IProductService;
 import com.example.demo.utils.ResponseSuccess;
@@ -8,14 +10,12 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -30,6 +30,29 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final IProductService service;
+
+    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get all products.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved", response = Page.class),
+    })
+    public ResponseEntity<Page<Product>> findAll(
+            @RequestParam(required = false, value = "page", defaultValue = "0") int page,
+            @RequestParam(required = false, value = "size", defaultValue = "10") int size,
+            @RequestParam(required = false, value = "orderBy", defaultValue = "id") String orderBy
+    ) {
+        return new ResponseEntity<>( this.service.findAll(page, size, orderBy), HttpStatus.OK);
+    }
+
+    @GetMapping( value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get product by id")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successfully retrieved", response = Product.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class)
+    })
+    public ResponseEntity<Product> findById(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(this.service.findById(id), HttpStatus.OK);
+    }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Create a new product.")

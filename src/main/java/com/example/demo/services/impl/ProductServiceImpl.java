@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -25,14 +27,27 @@ public class ProductServiceImpl implements IProductService {
     private final ProductRepository productRepository;
 
 
+    /**
+     * Obtener listado de todos los productos
+     * @param page
+     * @param size
+     * @param orderBy
+     * @return
+     */
     @Override
     public Page<Product> findAll(int page, int size, String orderBy) {
-        return null;
+        log.info("Init findAll products");
+        return this.productRepository.findAll(PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, orderBy)));
     }
 
+    /**
+     * Buscar producto por ID
+     * @param id
+     * @return
+     */
     @Override
     public Product findById(Long id) {
-        return null;
+        return this.productRepository.findById(id).orElseThrow(() -> new ErrorNotFound("Product not found"));
     }
 
     /**
