@@ -29,6 +29,7 @@ public class ProductServiceImpl implements IProductService {
 
     /**
      * Obtener listado de todos los productos
+     *
      * @param page
      * @param size
      * @param orderBy
@@ -42,16 +43,19 @@ public class ProductServiceImpl implements IProductService {
 
     /**
      * Buscar producto por ID
+     *
      * @param id
      * @return
      */
     @Override
     public Product findById(Long id) {
+        log.info("Init findById product");
         return this.productRepository.findById(id).orElseThrow(() -> new ErrorNotFound("Product not found"));
     }
 
     /**
      * Crear un nuevo producto
+     *
      * @param productDTO
      * @return
      */
@@ -81,9 +85,41 @@ public class ProductServiceImpl implements IProductService {
         }
     }
 
+    /**
+     * Actualizar producto
+     *
+     * @param productDTO
+     * @param id
+     * @return
+     */
     @Override
     public Product update(ProductDTO productDTO, Long id) {
-        return null;
+        log.info("Init update product");
+        try {
+            Long categoryId = Long.parseLong(productDTO.getCategoryId());
+            Optional<Category> category = this.categoryRepository.findById(categoryId);
+            if (category.isPresent()) {
+                Optional<Product> product = this.productRepository.findById(id);
+                if (product.isPresent()) {
+                    product.get().setName(productDTO.getName());
+                    product.get().setBrand(productDTO.getBrand());
+                    product.get().setDiscount(productDTO.getDiscount());
+                    product.get().setModel(productDTO.getModel());
+                    product.get().setPrice(productDTO.getPrice());
+                    product.get().setCategory(category.get());
+                    return this.productRepository.save(product.get());
+                } else {
+                    log.error("Product not found");
+                    throw new ErrorNotFound("Product not found.");
+                }
+            } else {
+                log.error("Category not found");
+                throw new ErrorNotFound("Category not found.");
+            }
+        } catch (NumberFormatException e) {
+            log.error("Invalid category, must be number.");
+            throw new NumberFormatException("Invalid category, must be number.");
+        }
     }
 
     @Override

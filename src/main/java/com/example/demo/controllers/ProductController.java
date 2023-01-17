@@ -41,10 +41,10 @@ public class ProductController {
             @RequestParam(required = false, value = "size", defaultValue = "10") int size,
             @RequestParam(required = false, value = "orderBy", defaultValue = "id") String orderBy
     ) {
-        return new ResponseEntity<>( this.service.findAll(page, size, orderBy), HttpStatus.OK);
+        return new ResponseEntity<>(this.service.findAll(page, size, orderBy), HttpStatus.OK);
     }
 
-    @GetMapping( value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get product by id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved", response = Product.class),
@@ -60,7 +60,7 @@ public class ProductController {
             @ApiResponse(code = 201, message = "Created", response = ResponseSuccess.class),
     })
     public ResponseEntity<?> create(@Valid @RequestBody ProductDTO productDTO, BindingResult results) {
-        if (results.hasErrors()){
+        if (results.hasErrors()) {
             Map<String, Object> errorMap = new HashMap<>();
             List<String> errors = results.getFieldErrors()
                     .stream()
@@ -69,10 +69,41 @@ public class ProductController {
             errorMap.put("code", HttpStatus.BAD_REQUEST.value());
             errorMap.put("errors", errors);
             return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
-        }else {
+        } else {
             this.service.create(productDTO);
             ResponseSuccess response = new ResponseSuccess(HttpStatus.CREATED.value(), "Product created successfully.");
             return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }
+    }
+
+    @PutMapping(
+            value = "/{id}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ApiOperation(value = "Update product.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ResponseSuccess.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
+    })
+    public ResponseEntity<?> update(
+            @Valid @RequestBody ProductDTO productDTO,
+            BindingResult results,
+            @PathVariable("id") Long id
+    ) {
+        if (results.hasErrors()) {
+            Map<String, Object> errorMap = new HashMap<>();
+            List<String> errors = results.getFieldErrors()
+                    .stream()
+                    .map(err -> "Field " + err.getField() + ": " + err.getDefaultMessage())
+                    .collect(Collectors.toList());
+            errorMap.put("code", HttpStatus.BAD_REQUEST.value());
+            errorMap.put("errors", errors);
+            return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
+        } else {
+            this.service.update(productDTO, id);
+            ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Product updated successfully");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
 }
