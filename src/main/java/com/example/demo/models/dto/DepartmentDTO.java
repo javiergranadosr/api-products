@@ -17,6 +17,6 @@ public class DepartmentDTO {
 
     @NotNull
     @NotEmpty
-    @Size(min = 10, max = 200)
+    @Size(min = 5, max = 200)
     private String name;
 }
