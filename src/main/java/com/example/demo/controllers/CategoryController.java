@@ -4,6 +4,7 @@ import com.example.demo.exceptions.ApiError;
 import com.example.demo.models.Category;
 import com.example.demo.models.dto.CategoryDTO;
 import com.example.demo.services.ICategoryService;
+import com.example.demo.utils.ListCategory;
 import com.example.demo.utils.ResponseSuccess;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +26,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/categories")
+@CrossOrigin(origins = "*", methods= {
+        RequestMethod.GET,
+        RequestMethod.POST,
+        RequestMethod.PUT,
+        RequestMethod.DELETE
+})
 @AllArgsConstructor
 @Api(tags = "CategoryController")
 public class CategoryController {
@@ -124,5 +131,18 @@ public class CategoryController {
         this.service.delete(id);
         ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Category deleted successfully.");
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @RequestMapping(
+            value = "/all/{id}",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ApiOperation( value = "Get all categories for select.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ListCategory.class),
+    })
+    public ResponseEntity<List<ListCategory>> getAllCategories(@PathVariable("id") Long id) {
+        return new ResponseEntity<>(this.service.getAllCategories(id), HttpStatus.OK);
     }
 }

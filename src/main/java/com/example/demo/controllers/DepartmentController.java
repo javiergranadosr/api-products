@@ -142,7 +142,7 @@ public class DepartmentController {
     )
     @ApiOperation( value = "Get all department for select.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ResponseSuccess.class),
+            @ApiResponse(code = 200, message = "OK", response = ListDepartment.class),
     })
     public ResponseEntity<List<ListDepartment>> getAllDepartments() {
         return new ResponseEntity<>(this.service.getAllDepartments(), HttpStatus.OK);

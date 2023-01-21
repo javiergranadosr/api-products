@@ -7,14 +7,18 @@ import com.example.demo.models.dto.CategoryDTO;
 import com.example.demo.repositories.CategoryRepository;
 import com.example.demo.repositories.DepartmentRepository;
 import com.example.demo.services.ICategoryService;
+import com.example.demo.utils.ListCategory;
+import com.example.demo.utils.NativeQuerys;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +28,7 @@ public class CategoryServiceImpl implements ICategoryService {
     private static final Logger log = LoggerFactory.getLogger(DepartmentServiceImpl.class);
     private final CategoryRepository repository;
     private final DepartmentRepository departmentRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     /**
      * Listado de categorias
@@ -114,6 +119,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     /**
      * Eliminar una categoria
+     *
      * @param id
      */
     @Override
@@ -122,10 +128,21 @@ public class CategoryServiceImpl implements ICategoryService {
         Optional<Category> category = this.repository.findById(id);
         if (category.isPresent()) {
             this.repository.delete(category.get());
-        }else {
+        } else {
             log.error("Error deleted category.");
             log.error("Category not found.");
             throw new ErrorNotFound("Category not found.");
         }
+    }
+
+    /**
+     * Listado de categorias para los combos filtros (select)
+     * @return
+     */
+    @Override
+    public List<ListCategory> getAllCategories(Long id) {
+        log.info("Init getAllCategories()");
+        return jdbcTemplate.query(NativeQuerys.GET_ALL_CATEGORIES, (rs, rowNum) ->
+                new ListCategory(rs.getLong("id"), rs.getString("name")),id);
     }
 }
