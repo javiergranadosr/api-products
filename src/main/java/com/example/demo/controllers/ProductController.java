@@ -25,7 +25,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/products")
-@CrossOrigin(origins = "*", methods= {RequestMethod.GET})
+@CrossOrigin(origins = "*", methods= {
+        RequestMethod.GET,
+        RequestMethod.POST,
+        RequestMethod.PUT,
+        RequestMethod.DELETE
+})
 @AllArgsConstructor
 @Api(tags = "ProductController")
 public class ProductController {

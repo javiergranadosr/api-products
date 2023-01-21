@@ -1,10 +1,10 @@
 package com.example.demo.controllers;
 
 import com.example.demo.exceptions.ApiError;
-import com.example.demo.models.Category;
 import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
 import com.example.demo.services.IDepartmentService;
+import com.example.demo.utils.ListDepartment;
 import com.example.demo.utils.ResponseSuccess;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +27,12 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/departments")
+@CrossOrigin(origins = "*", methods= {
+        RequestMethod.GET,
+        RequestMethod.POST,
+        RequestMethod.PUT,
+        RequestMethod.DELETE
+})
 @AllArgsConstructor
 @Api(tags = "DepartmentController")
 public class DepartmentController {
@@ -128,5 +134,17 @@ public class DepartmentController {
         this.service.delete(id);
         ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Department deleted successfully.");
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @RequestMapping(
+            value = "/all",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ApiOperation( value = "Get all department for select.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ResponseSuccess.class),
+    })
+    public ResponseEntity<List<ListDepartment>> getAllDepartments() {
+        return new ResponseEntity<>(this.service.getAllDepartments(), HttpStatus.OK);
     }
 }

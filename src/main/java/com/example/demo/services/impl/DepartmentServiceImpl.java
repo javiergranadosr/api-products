@@ -6,6 +6,8 @@ import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
 import com.example.demo.repositories.DepartmentRepository;
 import com.example.demo.services.IDepartmentService;
+import com.example.demo.utils.ListDepartment;
+import com.example.demo.utils.NativeQuerys;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
@@ -14,8 +16,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +29,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
 
     private final DepartmentRepository departmentRepository;
     private final ModelMapper modelMapper = new ModelMapper();
+    private final JdbcTemplate jdbcTemplate;
 
     /**
      * Obtener listado de los departamentos
@@ -74,6 +79,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
 
     /**
      * Actualizar Departamento
+     *
      * @param departmentDTO
      * @param id
      * @return
@@ -87,21 +93,36 @@ public class DepartmentServiceImpl implements IDepartmentService {
             departmentToPersist.setName(departmentDTO.getName());
             departmentToPersist.setKeyDepartment(departmentDTO.getKeyDepartment());
             return this.departmentRepository.save(departmentToPersist);
-        }else {
+        } else {
             log.error("Department not found.");
-            throw  new ErrorNotFound("Department not found.");
+            throw new ErrorNotFound("Department not found.");
         }
     }
 
+    /**
+     * Eliminar un departamento
+     * @param id
+     */
     @Override
     public void delete(Long id) {
         log.info("Init delete()");
         Optional<Department> department = this.departmentRepository.findById(id);
-        if(department.isPresent()) {
+        if (department.isPresent()) {
             this.departmentRepository.delete(department.get());
-        }else {
+        } else {
             log.error("Department not found.");
-            throw  new ErrorNotFound("Department not found.");
+            throw new ErrorNotFound("Department not found.");
         }
+    }
+
+    /**
+     * Listar departamento para los combos de filtros (select)
+     * @return
+     */
+    @Override
+    public List<ListDepartment> getAllDepartments() {
+        log.info("Init getAllDepartments()");
+        return jdbcTemplate.query(NativeQuerys.GET_ALL_DEPARTMENTS, (rs, rowNum) ->
+                new ListDepartment(rs.getLong("id"), rs.getString("name"), rs.getString("key_department")));
     }
 }

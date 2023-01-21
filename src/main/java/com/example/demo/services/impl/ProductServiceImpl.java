@@ -2,7 +2,6 @@ package com.example.demo.services.impl;
 
 import com.example.demo.exceptions.ErrorNotFound;
 import com.example.demo.models.Category;
-import com.example.demo.models.Department;
 import com.example.demo.models.Product;
 import com.example.demo.models.dto.ProductDTO;
 import com.example.demo.repositories.CategoryRepository;

@@ -112,6 +112,10 @@ public class CategoryServiceImpl implements ICategoryService {
         }
     }
 
+    /**
+     * Eliminar una categoria
+     * @param id
+     */
     @Override
     public void delete(Long id) {
         log.info("Init delete category");
