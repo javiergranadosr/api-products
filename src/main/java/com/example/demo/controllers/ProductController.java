@@ -48,7 +48,7 @@ public class ProductController {
             @RequestParam(required = false, value = "size", defaultValue = "10") int size,
             @RequestParam(required = false, value = "orderBy", defaultValue = "id") String orderBy
     ) {
-        if (categoryId == null) {
+        if (categoryId == null || categoryId == 0) {
             return new ResponseEntity<>(this.service.findAll(page, size, orderBy), HttpStatus.OK);
         }
         return new ResponseEntity<>(this.service.findByCategoryId(categoryId,page,size,orderBy), HttpStatus.OK);
