@@ -38,16 +38,20 @@ public class ProductController {
     private final IProductService service;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get all products.")
+    @ApiOperation(value = "Get all products or Get all products by category Id.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successfully retrieved", response = Page.class),
     })
     public ResponseEntity<Page<Product>> findAll(
+            @RequestParam(required = false, value = "categoryId") Long categoryId,
             @RequestParam(required = false, value = "page", defaultValue = "0") int page,
             @RequestParam(required = false, value = "size", defaultValue = "10") int size,
             @RequestParam(required = false, value = "orderBy", defaultValue = "id") String orderBy
     ) {
-        return new ResponseEntity<>(this.service.findAll(page, size, orderBy), HttpStatus.OK);
+        if (categoryId == null) {
+            return new ResponseEntity<>(this.service.findAll(page, size, orderBy), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(this.service.findByCategoryId(categoryId,page,size,orderBy), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

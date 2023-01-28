@@ -41,6 +41,20 @@ public class ProductServiceImpl implements IProductService {
     }
 
     /**
+     * Buscar listado de productos por categoria
+     * @param categoryId
+     * @param page
+     * @param size
+     * @param orderBy
+     * @return
+     */
+    @Override
+    public Page<Product> findByCategoryId(Long categoryId, int page, int size, String orderBy) {
+        log.info("Init findByCategoryId products");
+        return this.productRepository.findByCategoryId(categoryId, PageRequest.of(page,size, Sort.by(Sort.Direction.DESC, orderBy)));
+    }
+
+    /**
      * Buscar producto por ID
      *
      * @param id
