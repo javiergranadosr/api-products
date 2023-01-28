@@ -142,7 +142,12 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public List<ListCategory> getAllCategories(Long id) {
         log.info("Init getAllCategories()");
-        return jdbcTemplate.query(NativeQuerys.GET_ALL_CATEGORIES, (rs, rowNum) ->
-                new ListCategory(rs.getLong("id"), rs.getString("name")),id);
+        if(id == 0) {
+            return jdbcTemplate.query(NativeQuerys.GET_ALL_CATEGORIES, (rs, rowNum) ->
+                    new ListCategory(rs.getLong("id"), rs.getString("name")));
+        }else {
+            return jdbcTemplate.query(NativeQuerys.GET_ALL_CATEGORIES_BY_DEPARMENT_ID, (rs, rowNum) ->
+                    new ListCategory(rs.getLong("id"), rs.getString("name")),id);
+        }
     }
 }
