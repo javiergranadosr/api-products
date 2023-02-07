@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ICategoryService {
     Page<Category> findAll(int page, int size, String orderBy);
+    Page<Category> findByDepartmentId(Long departmentId, int page, int size, String orderBy);
     Category findById(Long id);
     Category create(CategoryDTO categoryDTO);
     Category update(CategoryDTO categoryDTO, Long id);

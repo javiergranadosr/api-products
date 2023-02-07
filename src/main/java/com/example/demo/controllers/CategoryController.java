@@ -45,12 +45,16 @@ public class CategoryController {
             @ApiResponse(code = 200, message = "Successfully retrieved", response = Page.class),
     })
     public ResponseEntity<Page<Category>> findAll(
+            @RequestParam(required = false, value = "departmentId") Long departmentId,
             @RequestParam(required = false, value = "page", defaultValue = "0") int page,
             @RequestParam(required = false, value = "size", defaultValue = "10") int size,
             @RequestParam(required = false, value = "orderBy", defaultValue = "id") String orderBy
 
     ) {
-        return new ResponseEntity<>(this.service.findAll(page, size, orderBy), HttpStatus.OK);
+        if (departmentId == null || departmentId == 0) {
+            return new ResponseEntity<>(this.service.findAll(page, size, orderBy), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(this.service.findByDepartmentId(departmentId, page, size, orderBy), HttpStatus.OK);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
