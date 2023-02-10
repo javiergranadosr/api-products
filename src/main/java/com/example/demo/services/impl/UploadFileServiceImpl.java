@@ -18,8 +18,10 @@ import java.util.UUID;
 
 @Service
 public class UploadFileServiceImpl implements IUploadFileService {
-
     private final static String IMAGES_DIRECTORY = "images";
+    public final static String IMAGES_DEPARTMENTS = "departments";
+    public final static String IMAGES_CATEGORIES = "categories";
+    public final static String IMAGES_PRODUCTS = "products";
     private static final Logger log = LoggerFactory.getLogger(UploadFileServiceImpl.class);
 
     /**
@@ -29,8 +31,8 @@ public class UploadFileServiceImpl implements IUploadFileService {
      * @throws MalformedURLException
      */
     @Override
-    public Resource getFile(String filename) throws MalformedURLException {
-        Path pathFile = getPath(filename);
+    public Resource getFile(String subFolder, String filename) throws MalformedURLException {
+        Path pathFile = getPath(subFolder, filename);
         Resource resource = new UrlResource(pathFile.toUri());
         if (!resource.exists() && !resource.isReadable()) {
             pathFile = Paths.get("src/main/resources/static/images").resolve("image_placeholder.jpg").toAbsolutePath();
@@ -45,9 +47,9 @@ public class UploadFileServiceImpl implements IUploadFileService {
      * @return
      */
     @Override
-    public String saveFile(MultipartFile file) {
+    public String saveFile(MultipartFile file, String subFolder) {
         String originalFilename = UUID.randomUUID() + "_" + file.getOriginalFilename().replace(" ", "");
-        Path pathFile = getPath(originalFilename);
+        Path pathFile = getPath(subFolder, originalFilename);
         try {
             Files.copy(file.getInputStream(), pathFile);
         } catch (IOException e) {
@@ -63,9 +65,9 @@ public class UploadFileServiceImpl implements IUploadFileService {
      * @return
      */
     @Override
-    public boolean deleteFile(String filename) {
+    public boolean deleteFile(String subFolder, String filename) {
         if (filename != null && filename.length() > 0) {
-            Path prevPathFile = getPath(filename);
+            Path prevPathFile = getPath(subFolder, filename);
             File prevFile = prevPathFile.toFile();
             if (prevFile.exists() && prevFile.canRead()) {
                 prevFile.delete();
@@ -81,7 +83,10 @@ public class UploadFileServiceImpl implements IUploadFileService {
      * @return
      */
     @Override
-    public Path getPath(String filename) {
+    public Path getPath(String subFolder, String filename) {
+        if (subFolder != null && subFolder.length() > 0) {
+            return Paths.get(IMAGES_DIRECTORY + "/" + subFolder).resolve(filename).toAbsolutePath();
+        }
         return Paths.get(IMAGES_DIRECTORY).resolve(filename).toAbsolutePath();
     }
 }

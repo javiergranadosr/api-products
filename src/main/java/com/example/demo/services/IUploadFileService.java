@@ -7,8 +7,8 @@ import java.net.MalformedURLException;
 import java.nio.file.Path;
 
 public interface IUploadFileService {
-    Resource getFile(String filename) throws MalformedURLException;
-    String saveFile(MultipartFile file);
-    boolean deleteFile(String filename);
-    Path getPath(String filename);
+    Resource getFile(String subFolder, String filename) throws MalformedURLException;
+    String saveFile(MultipartFile file, String subFolder);
+    boolean deleteFile(String subFolder, String filename);
+    Path getPath(String subFolder, String filename);
 }

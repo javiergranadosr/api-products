@@ -19,4 +19,6 @@ public class DepartmentDTO {
     @NotEmpty
     @Size(min = 5, max = 200)
     private String name;
+
+    private String image;
 }

@@ -27,6 +27,8 @@ public class Department {
     @Column(length = 200, nullable = false)
     private String name;
 
+    private String image;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "department", cascade = CascadeType.ALL)
     @JsonIgnoreProperties({"department", "hibernateLazyInitializer", "handler"})
     private List<Category> categories;

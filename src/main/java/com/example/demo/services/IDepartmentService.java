@@ -14,4 +14,5 @@ public interface IDepartmentService {
     Department update(DepartmentDTO departmentDTO, Long id);
     void delete(Long id);
     List<ListDepartment> getAllDepartments();
+    Department saveFile(Long departmentId, String filename);
 }

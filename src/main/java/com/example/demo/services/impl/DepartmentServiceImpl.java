@@ -125,4 +125,21 @@ public class DepartmentServiceImpl implements IDepartmentService {
         return jdbcTemplate.query(NativeQuerys.GET_ALL_DEPARTMENTS, (rs, rowNum) ->
                 new ListDepartment(rs.getLong("id"), rs.getString("name"), rs.getString("key_department")));
     }
+
+    /**
+     * Guardamos foto del departamento
+     * @param departmentId
+     * @param filename
+     * @return
+     */
+    @Override
+    public Department saveFile(Long departmentId, String filename) {
+        log.info("Init saveFile() in departments");
+        Optional<Department> department = this.departmentRepository.findById(departmentId);
+        if (department.isEmpty()) {
+            throw new ErrorNotFound("Department is not found.");
+        }
+        department.get().setImage(filename);
+        return this.departmentRepository.save(department.get());
+    }
 }

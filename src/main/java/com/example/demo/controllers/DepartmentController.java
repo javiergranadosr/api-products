@@ -4,6 +4,8 @@ import com.example.demo.exceptions.ApiError;
 import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
 import com.example.demo.services.IDepartmentService;
+import com.example.demo.services.IUploadFileService;
+import com.example.demo.services.impl.UploadFileServiceImpl;
 import com.example.demo.utils.ListDepartment;
 import com.example.demo.utils.ResponseSuccess;
 import io.swagger.annotations.Api;
@@ -17,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -27,7 +30,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/departments")
-@CrossOrigin(origins = "*", methods= {
+@CrossOrigin(origins = "*", methods = {
         RequestMethod.GET,
         RequestMethod.POST,
         RequestMethod.PUT,
@@ -38,6 +41,7 @@ import java.util.stream.Collectors;
 public class DepartmentController {
 
     private final IDepartmentService service;
+    private final IUploadFileService uploadFileService;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all departments.")
@@ -125,7 +129,7 @@ public class DepartmentController {
             method = RequestMethod.DELETE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiOperation( value = "Delete department.")
+    @ApiOperation(value = "Delete department.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = ResponseSuccess.class),
             @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
@@ -135,16 +139,42 @@ public class DepartmentController {
         ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Department deleted successfully.");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @RequestMapping(
             value = "/all",
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ApiOperation( value = "Get all department for select.")
+    @ApiOperation(value = "Get all department for select.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = ListDepartment.class),
     })
     public ResponseEntity<List<ListDepartment>> getAllDepartments() {
         return new ResponseEntity<>(this.service.getAllDepartments(), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Save file in department")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "CREATED", response = ResponseSuccess.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
+    })
+    public ResponseEntity<ResponseSuccess> savePhoto(
+            @RequestParam("id") Long id,
+            @RequestParam("file") MultipartFile file) {
+
+        String filename = null;
+        Department department = this.service.findById(id);
+        if (!file.isEmpty()) {
+            filename = this.uploadFileService.saveFile(file, UploadFileServiceImpl.IMAGES_DEPARTMENTS);
+            if (department.getImage() != null &&  department.getImage().length() > 0) {
+                this.uploadFileService.deleteFile(UploadFileServiceImpl.IMAGES_DEPARTMENTS, department.getImage());
+            }
+            this.service.saveFile(id, filename);
+            ResponseSuccess response = new ResponseSuccess(HttpStatus.CREATED.value(), "Department photo created successfully.");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }
+        ResponseSuccess response = new ResponseSuccess(HttpStatus.NOT_FOUND.value(), "Department photo is invalid.");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 }
