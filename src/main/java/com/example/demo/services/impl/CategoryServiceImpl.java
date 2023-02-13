@@ -83,7 +83,7 @@ public class CategoryServiceImpl implements ICategoryService {
             Long departmentId = Long.parseLong(categoryDTO.getDepartmentId());
             Optional<Department> department = this.departmentRepository.findById(departmentId);
             if (department.isPresent()) {
-                Category category = new Category(null, categoryDTO.getName(), department.get(), null);
+                Category category = new Category(null, categoryDTO.getName(), null,department.get(), null);
                 return this.repository.save(category);
             } else {
                 log.error("Department not found");
@@ -163,5 +163,22 @@ public class CategoryServiceImpl implements ICategoryService {
             return jdbcTemplate.query(NativeQuerys.GET_ALL_CATEGORIES_BY_DEPARMENT_ID, (rs, rowNum) ->
                     new ListCategory(rs.getLong("id"), rs.getString("name")),id);
         }
+    }
+
+    /**
+     * Guardamos imagen de la categoria
+     * @param categoryId
+     * @param filename
+     * @return
+     */
+    @Override
+    public Category saveFile(Long categoryId, String filename) {
+        log.info("Init saveFile() in categories");
+        Optional<Category> category = this.repository.findById(categoryId);
+        if (category.isEmpty()) {
+            throw new ErrorNotFound("Category not found.");
+        }
+        category.get().setImage(filename);
+        return this.repository.save(category.get());
     }
 }

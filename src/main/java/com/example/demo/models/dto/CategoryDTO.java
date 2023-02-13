@@ -15,6 +15,8 @@ public class CategoryDTO {
     @Size(min = 5, max = 200)
     private String name;
 
+    private String image;
+
     @NotNull
     @NotEmpty
     private String departmentId;

@@ -15,4 +15,5 @@ public interface ICategoryService {
     Category update(CategoryDTO categoryDTO, Long id);
     void delete(Long id);
     List<ListCategory> getAllCategories(Long id);
+    Category saveFile(Long categoryId, String filename);
 }

@@ -20,6 +20,8 @@ public class Category {
     @Column(length = 200, nullable = false)
     private String name;
 
+    private String image;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"categories", "hibernateLazyInitializer", "handler"})
     private Department department;

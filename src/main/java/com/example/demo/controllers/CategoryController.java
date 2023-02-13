@@ -4,6 +4,9 @@ import com.example.demo.exceptions.ApiError;
 import com.example.demo.models.Category;
 import com.example.demo.models.dto.CategoryDTO;
 import com.example.demo.services.ICategoryService;
+import com.example.demo.services.IUploadFileService;
+import com.example.demo.services.impl.UploadFileServiceImpl;
+import com.example.demo.utils.CFiles;
 import com.example.demo.utils.ListCategory;
 import com.example.demo.utils.ResponseSuccess;
 import io.swagger.annotations.Api;
@@ -11,12 +14,14 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -37,6 +42,8 @@ import java.util.stream.Collectors;
 public class CategoryController {
 
     private final ICategoryService service;
+    private final IUploadFileService uploadFileService;
+    private final CFiles files;
 
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -148,5 +155,38 @@ public class CategoryController {
     })
     public ResponseEntity<List<ListCategory>> getAllCategories(@PathVariable("id") Long id) {
         return new ResponseEntity<>(this.service.getAllCategories(id), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Save file in category")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "CREATED", response = ResponseSuccess.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
+    })
+    public ResponseEntity<ResponseSuccess> savePhoto(
+            @RequestParam("id") Long id,
+            @RequestParam("file") MultipartFile file) {
+
+        String filename = null;
+        Category category = this.service.findById(id);
+        if (!file.isEmpty()) {
+            filename = this.uploadFileService.saveFile(file, UploadFileServiceImpl.IMAGES_CATEGORIES);
+            if (category.getImage() != null && category.getImage().length() > 0) {
+                this.uploadFileService.deleteFile(UploadFileServiceImpl.IMAGES_CATEGORIES, category.getImage());
+            }
+            this.service.saveFile(id, filename);
+            ResponseSuccess response = new ResponseSuccess(HttpStatus.CREATED.value(), "Category photo created successfully.");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }
+        ResponseSuccess response = new ResponseSuccess(HttpStatus.NOT_FOUND.value(), "Category photo is invalid.");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/show-image/{filename:.+}") // Example [image.png, image.jpeg, image.gif, ...]
+    @ApiOperation(value = "Show image category")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class)})
+    public ResponseEntity<Resource> showPhoto(@PathVariable("filename") String filename) {
+        Resource resource = this.files.getResource(UploadFileServiceImpl.IMAGES_CATEGORIES, filename);
+        return new ResponseEntity<>(resource, this.files.getHeaders(resource), HttpStatus.OK);
     }
 }
