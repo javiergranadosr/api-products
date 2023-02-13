@@ -6,6 +6,7 @@ import com.example.demo.models.dto.DepartmentDTO;
 import com.example.demo.services.IDepartmentService;
 import com.example.demo.services.IUploadFileService;
 import com.example.demo.services.impl.UploadFileServiceImpl;
+import com.example.demo.utils.CFiles;
 import com.example.demo.utils.ListDepartment;
 import com.example.demo.utils.ResponseSuccess;
 import io.swagger.annotations.Api;
@@ -13,7 +14,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +46,7 @@ public class DepartmentController {
 
     private final IDepartmentService service;
     private final IUploadFileService uploadFileService;
+    private final CFiles files;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all departments.")
@@ -167,7 +172,7 @@ public class DepartmentController {
         Department department = this.service.findById(id);
         if (!file.isEmpty()) {
             filename = this.uploadFileService.saveFile(file, UploadFileServiceImpl.IMAGES_DEPARTMENTS);
-            if (department.getImage() != null &&  department.getImage().length() > 0) {
+            if (department.getImage() != null && department.getImage().length() > 0) {
                 this.uploadFileService.deleteFile(UploadFileServiceImpl.IMAGES_DEPARTMENTS, department.getImage());
             }
             this.service.saveFile(id, filename);
@@ -176,5 +181,13 @@ public class DepartmentController {
         }
         ResponseSuccess response = new ResponseSuccess(HttpStatus.NOT_FOUND.value(), "Department photo is invalid.");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/show-image/{filename:.+}") // Example [image.png, image.jpeg, image.gif, ...]
+    @ApiOperation(value = "Show image department")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class)})
+    public ResponseEntity<Resource> showPhoto(@PathVariable("filename") String filename) {
+        Resource resource = this.files.getResource(UploadFileServiceImpl.IMAGES_DEPARTMENTS, filename);
+        return new ResponseEntity<>(resource, this.files.getHeaders(resource), HttpStatus.OK);
     }
 }
