@@ -34,6 +34,7 @@ public class Product {
     @Column(nullable = false)
     private double discount;
 
+    private String image;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties({"products", "hibernateLazyInitializer", "handler"})

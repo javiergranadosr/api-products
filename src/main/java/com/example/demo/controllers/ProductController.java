@@ -1,21 +1,27 @@
 package com.example.demo.controllers;
 
 import com.example.demo.exceptions.ApiError;
+import com.example.demo.models.Department;
 import com.example.demo.models.Product;
 import com.example.demo.models.dto.ProductDTO;
 import com.example.demo.services.IProductService;
+import com.example.demo.services.IUploadFileService;
+import com.example.demo.services.impl.UploadFileServiceImpl;
+import com.example.demo.utils.CFiles;
 import com.example.demo.utils.ResponseSuccess;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -36,6 +42,8 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final IProductService service;
+    private final IUploadFileService uploadFileService;
+    private final CFiles files;
 
     @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all products or Get all products by category Id.")
@@ -127,6 +135,40 @@ public class ProductController {
         this.service.delete(id);
         ResponseSuccess response = new ResponseSuccess(HttpStatus.OK.value(), "Product deleted successfully.");
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Save file in product")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "CREATED", response = ResponseSuccess.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiError.class),
+    })
+    public ResponseEntity<ResponseSuccess> savePhoto(
+            @RequestParam("id") Long id,
+            @RequestParam("file") MultipartFile file) {
+
+        String filename = null;
+        Product product = this.service.findById(id);
+        if (!file.isEmpty()) {
+            filename = this.uploadFileService.saveFile(file, UploadFileServiceImpl.IMAGES_PRODUCTS);
+            if (product.getImage() != null && product.getImage().length() > 0) {
+                this.uploadFileService.deleteFile(UploadFileServiceImpl.IMAGES_PRODUCTS, product.getImage());
+            }
+            this.service.saveFile(id, filename);
+            ResponseSuccess response = new ResponseSuccess(HttpStatus.CREATED.value(), "Product photo created successfully.");
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        }
+        ResponseSuccess response = new ResponseSuccess(HttpStatus.NOT_FOUND.value(), "Product photo is invalid.");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/show-image/{filename:.+}") // Example [image.png, image.jpeg, image.gif, ...]
+    @ApiOperation(value = "Show image product")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class)})
+    public ResponseEntity<Resource> showPhoto(@PathVariable("filename") String filename) {
+        Resource resource = this.files.getResource(UploadFileServiceImpl.IMAGES_PRODUCTS, filename);
+        return new ResponseEntity<>(resource, this.files.getHeaders(resource), HttpStatus.OK);
     }
 }
 

@@ -86,6 +86,7 @@ public class ProductServiceImpl implements IProductService {
                         productDTO.getModel(),
                         productDTO.getPrice(),
                         productDTO.getDiscount(),
+                        null,
                         category.get());
                 return this.productRepository.save(product);
             } else {
@@ -149,5 +150,22 @@ public class ProductServiceImpl implements IProductService {
             log.error("Product not found");
             throw new ErrorNotFound("Product not found.");
         }
+    }
+
+    /**
+     * Se crea servicio para guardar fotos en productos
+     * @param productId
+     * @param filename
+     * @return
+     */
+    @Override
+    public Product saveFile(Long productId, String filename) {
+        log.info("Init saveFile() in products");
+        Optional<Product> product = this.productRepository.findById(productId);
+        if (product.isEmpty()) {
+            throw new ErrorNotFound("Product not found");
+        }
+        product.get().setImage(filename);
+        return this.productRepository.save(product.get());
     }
 }

@@ -137,7 +137,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
         log.info("Init saveFile() in departments");
         Optional<Department> department = this.departmentRepository.findById(departmentId);
         if (department.isEmpty()) {
-            throw new ErrorNotFound("Department is not found.");
+            throw new ErrorNotFound("Department  not found.");
         }
         department.get().setImage(filename);
         return this.departmentRepository.save(department.get());

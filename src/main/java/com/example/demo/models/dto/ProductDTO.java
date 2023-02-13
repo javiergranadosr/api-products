@@ -31,6 +31,8 @@ public class ProductDTO {
     @NotNull
     private double discount;
 
+    private String image;
+
     @NotNull
     @NotEmpty
     private String categoryId;

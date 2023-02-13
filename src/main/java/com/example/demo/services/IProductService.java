@@ -11,5 +11,6 @@ public interface IProductService {
     Product create(ProductDTO productDTO);
     Product update(ProductDTO productDTO, Long id);
     void delete(Long id);
+    Product saveFile(Long productId, String filename);
 
 }
