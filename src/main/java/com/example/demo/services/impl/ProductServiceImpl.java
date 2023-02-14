@@ -7,6 +7,7 @@ import com.example.demo.models.dto.ProductDTO;
 import com.example.demo.repositories.CategoryRepository;
 import com.example.demo.repositories.ProductRepository;
 import com.example.demo.services.IProductService;
+import com.example.demo.services.IUploadFileService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class ProductServiceImpl implements IProductService {
     private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final IUploadFileService uploadFileService;
 
 
     /**
@@ -145,6 +147,9 @@ public class ProductServiceImpl implements IProductService {
         log.info("Init delete producto.");
         Optional<Product> product = this.productRepository.findById(id);
         if (product.isPresent()) {
+            if (product.get().getImage() != null && product.get().getImage().length() > 0) {
+                this.uploadFileService.deleteFile(UploadFileServiceImpl.IMAGES_PRODUCTS, product.get().getImage());
+            }
             this.productRepository.delete(product.get());
         } else {
             log.error("Product not found");

@@ -7,6 +7,7 @@ import com.example.demo.models.dto.CategoryDTO;
 import com.example.demo.repositories.CategoryRepository;
 import com.example.demo.repositories.DepartmentRepository;
 import com.example.demo.services.ICategoryService;
+import com.example.demo.services.IUploadFileService;
 import com.example.demo.utils.ListCategory;
 import com.example.demo.utils.NativeQuerys;
 import lombok.AllArgsConstructor;
@@ -29,6 +30,7 @@ public class CategoryServiceImpl implements ICategoryService {
     private final CategoryRepository repository;
     private final DepartmentRepository departmentRepository;
     private final JdbcTemplate jdbcTemplate;
+    private final IUploadFileService uploadFileService;
 
     /**
      * Listado de categorias
@@ -141,6 +143,9 @@ public class CategoryServiceImpl implements ICategoryService {
         log.info("Init delete category");
         Optional<Category> category = this.repository.findById(id);
         if (category.isPresent()) {
+            if (category.get().getImage() != null && category.get().getImage().length() > 0) {
+                this.uploadFileService.deleteFile(UploadFileServiceImpl.IMAGES_CATEGORIES, category.get().getImage());
+            }
             this.repository.delete(category.get());
         } else {
             log.error("Error deleted category.");

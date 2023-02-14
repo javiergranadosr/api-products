@@ -6,6 +6,7 @@ import com.example.demo.models.Department;
 import com.example.demo.models.dto.DepartmentDTO;
 import com.example.demo.repositories.DepartmentRepository;
 import com.example.demo.services.IDepartmentService;
+import com.example.demo.services.IUploadFileService;
 import com.example.demo.utils.ListDepartment;
 import com.example.demo.utils.NativeQuerys;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class DepartmentServiceImpl implements IDepartmentService {
     private final DepartmentRepository departmentRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private final JdbcTemplate jdbcTemplate;
+    private final IUploadFileService uploadFileService;
 
     /**
      * Obtener listado de los departamentos
@@ -108,6 +110,9 @@ public class DepartmentServiceImpl implements IDepartmentService {
         log.info("Init delete()");
         Optional<Department> department = this.departmentRepository.findById(id);
         if (department.isPresent()) {
+            if (department.get().getImage() != null && department.get().getImage().length() > 0) {
+                this.uploadFileService.deleteFile(UploadFileServiceImpl.IMAGES_DEPARTMENTS, department.get().getImage());
+            }
             this.departmentRepository.delete(department.get());
         } else {
             log.error("Department not found.");
