@@ -12,6 +12,7 @@
 ### Para poder levantar el proyecto es necesario realizar las siguientes instalaciones:
 
 * Instalar dependencias
+* Crear base de datos: api_products
 
 Para visualizar el proyecto por favor ingresar a la siguiente liga:
 
